@@ -1,3 +1,3 @@
 module VexRails
-  VERSION = "0.2.0"
+  VERSION = '2.3.4'
 end

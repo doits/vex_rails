@@ -81,8 +81,11 @@
         }), 0);
         return options.$vexContent;
       },
+      getSelectorFromBaseClass: function(baseClass) {
+        return "." + (baseClass.split(' ').join('.'));
+      },
       getAllVexes: function() {
-        return $("." + vex.baseClassNames.vex + ":not(\"." + vex.baseClassNames.closing + "\") ." + vex.baseClassNames.content);
+        return $("." + vex.baseClassNames.vex + ":not(\"." + vex.baseClassNames.closing + "\") " + (vex.getSelectorFromBaseClass(vex.baseClassNames.content)));
       },
       getVexByID: function(id) {
         return vex.getAllVexes().filter(function() {
@@ -114,7 +117,7 @@
         return true;
       },
       closeByID: function(id) {
-        var $vex, $vexContent, beforeClose, close, options;
+        var $vex, $vexContent, beforeClose, close, hasAnimation, options;
         $vexContent = vex.getVexByID(id);
         if (!$vexContent.length) {
           return;
@@ -129,18 +132,22 @@
         close = function() {
           $vexContent.trigger('vexClose', options);
           $vex.remove();
+          $('body').trigger('vexAfterClose', options);
           if (options.afterClose) {
             return options.afterClose($vexContent, options);
           }
         };
-        if (animationEndSupport) {
-          beforeClose();
-          $vex.unbind(vex.animationEndEvent).bind(vex.animationEndEvent, function() {
-            return close();
-          }).addClass(vex.baseClassNames.closing);
+        hasAnimation = $vexContent.css('animationName') !== 'none' && $vexContent.css('animationDuration') !== '0s';
+        if (animationEndSupport && hasAnimation) {
+          if (beforeClose() !== false) {
+            $vex.unbind(vex.animationEndEvent).bind(vex.animationEndEvent, function() {
+              return close();
+            }).addClass(vex.baseClassNames.closing);
+          }
         } else {
-          beforeClose();
-          close();
+          if (beforeClose() !== false) {
+            close();
+          }
         }
         return true;
       },
@@ -160,9 +167,9 @@
         return vex.closeByID(id);
       },
       setupBodyClassName: function($vex) {
-        return $vex.bind('vexOpen.vex', function() {
+        return $('body').bind('vexOpen.vex', function() {
           return $('body').addClass(vex.baseClassNames.open);
-        }).bind('vexClose.vex', function() {
+        }).bind('vexAfterClose.vex', function() {
           if (!vex.getAllVexes().length) {
             return $('body').removeClass(vex.baseClassNames.open);
           }
