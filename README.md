@@ -45,15 +45,15 @@ Lets get started!
 
     # In your application.js
 
-    //= require vex.js
-    //= require vex.dialog.js
+    //= require vex
+    //= require vex.dialog
 
     vex.defaultOptions.className = 'vex-theme-os';
 
     # In your application.css
 
-    *= require vex.css
-    *= require vex-theme-os.css
+    *= require vex
+    *= require vex-theme-os
 
 That will give you all of the APIs for both Vex and Vex Dialog, and set you up with the "Operating System" theme. If you'd prefer another theme, check out [Themes].
 
